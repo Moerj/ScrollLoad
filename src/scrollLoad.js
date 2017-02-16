@@ -28,6 +28,7 @@ class ScrollLoad {
             maxload: 1000, //最大条数
             perload: 27, //每次分页条数
             isloading: false, //加载等待
+            iscomplate: false, //最后一页数据加载完成
             currentPage: 1, //当前页
             listContanier: opt.scrollContanier, //list容器，默认等于scroll容器
             scrollContanier: opt.scrollContanier,
@@ -45,8 +46,6 @@ class ScrollLoad {
 
         // 创建loading
         this.loadEffect = $(LOADEFFECT_TPL).appendTo(this.listContanier)
-
-        // return
 
         // 调整最大页数
         if (this.perload > this.maxload) {
@@ -185,13 +184,13 @@ class ScrollLoad {
 
     // 滚动逻辑
     scroll() {
+        // 如果正在加载，则退出
+        if (this.isloading || this.iscomplate) return;
+
         // 滚动到接近底部时加载数据
         if (this.scrollContanier.scrollTop() + this.scrollContanier.height() + 100 < this.scrollContanier[0].scrollHeight) {
             return
         }
-
-        // 如果正在加载，则退出
-        if (this.isloading) return;
 
         // 超出最大限制
         if (this.listContanier.children().length >= this.maxload) {
@@ -217,24 +216,17 @@ class ScrollLoad {
     // 刷新数据
     reload() {
         // 滚动条置顶
-        this.scrollContanier[0].scrollTop = 0;
+        this.scrollContanier[0].scrollTop = 0
 
         // 还原loading的效果
         this.loadEffect.replaceWith(LOADEFFECT_TPL)
 
         // 当前页从1开始
-        this.currentPage = 1;
+        this.currentPage = 1
 
         // 重置状态
-        this.isloading = false;
-
-        // 开启无限加载
-        this.scrollContanier.on('scroll', () => {
-            this.scroll()
-        })
-
-        // loading效果
-        $.showIndicator()
+        this.isloading = false
+        this.iscomplate = false
 
         this.ajax({
             currentPage: 1, //当前页
@@ -242,14 +234,13 @@ class ScrollLoad {
         }, (data) => {
             this.listContanier.empty()
             this._ajax(data)
-            $.hideIndicator();
         })
     }
 
     // 加载完成
     finish() {
-        // 关闭滚动监听
-        this.scrollContanier.off('scroll')
+        // 设置状态 - 全部数据加载完成
+        this.iscomplate = true
 
         // 内容出现混动条时，才会显示已经到底
         let h1 = this.loadEffect[0].offsetTop
