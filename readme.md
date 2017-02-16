@@ -72,3 +72,6 @@ let loader = new ScrollLoad({
     })
 
 ```
+
+## 运行环境
+暂时只支持es6环境，需要兼容es5请自行构建编译
