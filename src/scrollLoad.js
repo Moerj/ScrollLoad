@@ -214,7 +214,7 @@ class ScrollLoad {
     }
 
     // 刷新数据
-    reload() {
+    reload(reload_callback) {
         // 滚动条置顶
         this.scrollContanier[0].scrollTop = 0
 
@@ -234,6 +234,7 @@ class ScrollLoad {
         }, (data) => {
             this.listContanier.empty()
             this._ajax(data)
+            reload_callback()
         })
     }
 
